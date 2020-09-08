@@ -1,4 +1,4 @@
-# MYOBTestService
+# MYOBTestService [![Build Status](https://travis-ci.com/Evedel/ops-technical-test.svg?branch=master)](https://travis-ci.com/Evedel/ops-technical-test)
 
 > ## Platform Enablement Technical Test
 

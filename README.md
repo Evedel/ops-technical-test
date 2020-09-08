@@ -1,19 +1,16 @@
-# Platform Enablement Technical Test
+# MYOBTestService
 
-We would like you to write an application in a language of your choice
-which covers a few points of interest. It will be evaluated holistically,
-so take this as an opportunity to show the breadth of your skills or knowledge.
+> ## Platform Enablement Technical Test
 
-## Application Details
+> Your application should be a simple, small, operable web-style API or service provider.
 
-Your application should be a simple, small, operable web-style API or service
-provider. It should implement the following:
+To keep things simple, I chose to use `go` with no additional third party packages for my application.
 
-- a simple root endpoint which responds in a simple manner; "hello world" or some such
-- a health endpoint which returns an appropriate response code
-- a metadata endpoint which returns basic information about your application; example:
-
-```json
+The application implements:
+- `appaddr/` a root endpoint, which responds `hello world`
+- `appaddr/healthcheck` a health endpoint, which returns http code `200` if application status is healthy and `500` if it is not
+- `appaddr/metadata` a metadata endpoint, which returns basic information about application
+```
 "myapplication": [
   {
     "version": "1.0",
@@ -23,13 +20,30 @@ provider. It should implement the following:
 ]
 ```
 
-- tests or a test suite; the type of testing is up to you
+### The project also contains:
+- a test suite: the set of unit tests to check the correctness of the code and python script to check if the endpoints are accessible.
+- a means of packaging my application as a single deployable artefact ([Dockerfile](Dockerfile))
+- a pipeline that builds my application on each commit ([.travis.yml](.travis.yml))
 
-## Fit and Finish
+### The application and its deployment steps:
+The application has following packages:
+- `main` (registers the endpoints and starts listener at `:8080`)
+- `handlers` (functions that convert go structures to strings and write them into html responses)
+- `healthcheck` (runs health check and returns the response code)
+- `storage` (obtains and constructs the application metadata)
 
-Once the application has been written, continue with the following additions:
+Deployment contains three stages:
+- executing unit test
+- executing api call tests
+- building docker image and pushing it to the `evedel/myobtestservice`
 
-- provide a means of packaging your application as a single deployable artifact which encapsulates its dependencies
-- create a pipeline that builds your application on each commit; Travis or similar, for example
-- describe or demonstrate any risks associated with your application/deployment
-- write a clear and understandable `README` which explains your application and its deployment steps
+One can run the application with
+
+```
+docker run -rm -p12345:8080 evedel/myobtestservice
+```
+
+### Possible risks associated with my application/deployment:
+- there is no https (service might be put behind secure reverse proxy)
+- there is no serving port configuration (docker port forwarding might be used for this means)
+- there might be bugs

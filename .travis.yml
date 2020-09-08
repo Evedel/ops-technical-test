@@ -1,0 +1,27 @@
+language: go
+go: 1.15.x
+os: linux
+services: docker
+
+before_install: cd app
+before_script: cd ../
+
+jobs:
+  include:
+    - stage: "Test: Unit"
+      script:
+      - cd app
+      - go test ./...
+    - stage: "Test: API"
+      script:
+      - cd app
+      - go build -o $APPNAME
+      - ./$APPNAME &
+      - cd ../
+      - ./testAPI.py
+      - kill $(ps aux | grep "$APPNAME" | grep -v 'grep' | awk '{print$2}')
+    - stage: deploy
+      script:
+      - docker build -t $DOCKER_USERNAME/myobtestservice ./
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker push $DOCKER_USERNAME/myobtestservice
